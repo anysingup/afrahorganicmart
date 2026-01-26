@@ -6,9 +6,9 @@ import { notFound } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Minus, Plus, ShoppingCart, Star } from 'lucide-react';
+import { Loader2, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
 
-import { products, siteConfig } from '@/lib/data';
+import { products } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +31,7 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
+import { createOrder } from '@/ai/flows/create-order-flow';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -51,6 +52,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   const { toast } = useToast();
   const product = products.find((p) => p.slug === params.slug);
   const [quantity, setQuantity] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,34 +77,42 @@ export default function ProductPage({ params }: ProductPageProps) {
     });
   };
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    const phoneNumber = siteConfig.phone.replace(/\D/g, '');
-    const totalPrice = product.price * quantity;
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      const totalPrice = product.price * quantity;
+      const orderDetails = {
+        productName: product.name,
+        quantity: quantity,
+        totalPrice: totalPrice,
+        customerName: data.name,
+        address: data.address,
+        phone: data.phone,
+        paymentMethod: data.paymentMethod,
+      };
 
-    const message = `
-Hello ${siteConfig.name}, I would like to place an order.
+      const result = await createOrder(orderDetails);
 
-*Product:* ${product.name}
-*Quantity:* ${quantity}
-*Total Price:* ৳${totalPrice}
-
-*My Details:*
-*Name:* ${data.name}
-*Address:* ${data.address}
-*Phone:* ${data.phone}
-*Payment Method:* ${data.paymentMethod.toUpperCase()}
-
-Thank you!
-    `;
-
-    const whatsappUrl = `https://wa.me/88${phoneNumber}?text=${encodeURIComponent(message.trim())}`;
-    
-    window.open(whatsappUrl, '_blank');
-
-    toast({
-      title: 'Redirecting to WhatsApp',
-      description: 'Please confirm your order on WhatsApp.',
-    });
+      if (result.success) {
+        toast({
+          title: 'Order Placed!',
+          description: "We've received your order and will be in touch soon.",
+        });
+        form.reset();
+        setQuantity(1);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (e: any) {
+      console.error("Order submission failed", e);
+      toast({
+        variant: "destructive",
+        title: "Oh no! Something went wrong.",
+        description: e.message || "Could not place your order. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -264,8 +274,18 @@ Thank you!
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="lg" className="w-full">
-                <ShoppingCart className="mr-2 h-5 w-5" /> Place Order via WhatsApp
+              <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+                 {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Placing Order...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="mr-2 h-5 w-5" />
+                      Place Order
+                    </>
+                  )}
               </Button>
             </form>
           </Form>
