@@ -96,7 +96,16 @@ export default function ProductPage({ params }: ProductPageProps) {
       if (result.success) {
         toast({
           title: 'Order Placed!',
-          description: "We've received your order and will be in touch soon.",
+          description: (
+            <>
+              <p className="mb-2">We've received your order. Here is the data that was sent:</p>
+              <pre className="mt-2 w-[340px] rounded-md bg-muted p-4">
+                <code className="text-muted-foreground">
+                  {JSON.stringify(orderDetails, null, 2)}
+                </code>
+              </pre>
+            </>
+          ),
         });
         form.reset();
         setQuantity(1);
