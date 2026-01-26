@@ -34,6 +34,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import { useFirestore, useUser } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -91,41 +93,43 @@ export default function ProductPage({ params }: ProductPageProps) {
       return;
     }
     setIsSubmitting(true);
-    try {
-      const totalPrice = product.price * quantity;
-      const orderDetails = {
-        productName: product.name,
-        quantity: quantity,
-        totalPrice: totalPrice,
-        customerName: data.name,
-        address: data.address,
-        phone: data.phone,
-        paymentMethod: data.paymentMethod,
-        status: 'Pending',
-        createdAt: serverTimestamp(),
-        userId: user?.uid || null,
-      };
 
-      const ordersCollection = collection(firestore, 'orders');
-      await addDoc(ordersCollection, orderDetails);
+    const totalPrice = product.price * quantity;
+    const orderDetails = {
+      productName: product.name,
+      quantity: quantity,
+      totalPrice: totalPrice,
+      customerName: data.name,
+      address: data.address,
+      phone: data.phone,
+      paymentMethod: data.paymentMethod,
+      status: 'Pending' as const,
+      createdAt: serverTimestamp(),
+      userId: user?.uid || null,
+    };
 
-      toast({
-        title: 'Order Placed!',
-        description: "We've received your order and will process it shortly.",
+    const ordersCollection = collection(firestore, 'orders');
+
+    addDoc(ordersCollection, orderDetails)
+      .then(() => {
+        toast({
+          title: 'Order Placed!',
+          description: "We've received your order and will process it shortly.",
+        });
+        form.reset();
+        setQuantity(1);
+      })
+      .catch((e) => {
+        const permissionError = new FirestorePermissionError({
+            path: `orders`,
+            operation: 'create',
+            requestResourceData: orderDetails,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
-      form.reset();
-      setQuantity(1);
-
-    } catch (e: any) {
-      console.error("Order submission failed", e);
-      toast({
-        variant: "destructive",
-        title: "Oh no! Something went wrong.",
-        description: e.message || "Could not place your order. Please try again.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   }
 
   return (

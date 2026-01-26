@@ -51,11 +51,11 @@ export default function AdminDashboard() {
             </TableHeader>
             <TableBody>
               {orders && orders.length > 0 ? (
-                orders.map((order) => (
+                [...orders].sort((a, b) => b.createdAt.seconds - a.createdAt.seconds).slice(0,5).map((order) => (
                   <TableRow key={order.id}>
                     <TableCell>
                       {order.createdAt?.seconds 
-                        ? format(new Date(order.createdAt.seconds * 1000), 'dd MMM, yyyy')
+                        ? format(new Date(order.createdAt.seconds * 1000), 'PP')
                         : 'N/A'
                       }
                     </TableCell>
