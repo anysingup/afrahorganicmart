@@ -7,6 +7,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Loader2, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
 
 import { products } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -31,7 +33,7 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { createOrder } from '@/ai/flows/create-order-flow';
+import { useFirestore, useUser } from '@/firebase';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -53,6 +55,8 @@ export default function ProductPage({ params }: ProductPageProps) {
   const product = products.find((p) => p.slug === params.slug);
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const firestore = useFirestore();
+  const { user } = useUser();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -78,6 +82,14 @@ export default function ProductPage({ params }: ProductPageProps) {
   };
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    if (!firestore) {
+      toast({
+        variant: "destructive",
+        title: "Database service not available.",
+        description: "Please try again later.",
+      });
+      return;
+    }
     setIsSubmitting(true);
     try {
       const totalPrice = product.price * quantity;
@@ -89,29 +101,21 @@ export default function ProductPage({ params }: ProductPageProps) {
         address: data.address,
         phone: data.phone,
         paymentMethod: data.paymentMethod,
+        status: 'Pending',
+        createdAt: serverTimestamp(),
+        userId: user?.uid || null,
       };
 
-      const result = await createOrder(orderDetails);
+      const ordersCollection = collection(firestore, 'orders');
+      await addDoc(ordersCollection, orderDetails);
 
-      if (result.success) {
-        toast({
-          title: 'Order Placed!',
-          description: (
-            <>
-              <p className="mb-2">We've received your order. Here is the data that was sent:</p>
-              <pre className="mt-2 w-[340px] rounded-md bg-muted p-4">
-                <code className="text-muted-foreground">
-                  {JSON.stringify(orderDetails, null, 2)}
-                </code>
-              </pre>
-            </>
-          ),
-        });
-        form.reset();
-        setQuantity(1);
-      } else {
-        throw new Error(result.message);
-      }
+      toast({
+        title: 'Order Placed!',
+        description: "We've received your order and will process it shortly.",
+      });
+      form.reset();
+      setQuantity(1);
+
     } catch (e: any) {
       console.error("Order submission failed", e);
       toast({

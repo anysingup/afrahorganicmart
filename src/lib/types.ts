@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface Product {
   id: string;
   name: string;
@@ -25,4 +27,18 @@ export interface Testimonial {
   title: string;
   quote: string;
   avatar: string;
+}
+
+export interface Order {
+    id?: string;
+    userId: string | null;
+    productName: string;
+    quantity: number;
+    totalPrice: number;
+    customerName: string;
+    address: string;
+    phone: string;
+    paymentMethod: string;
+    status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+    createdAt: Timestamp;
 }

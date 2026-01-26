@@ -5,6 +5,9 @@ import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/shared/header';
 import Footer from '@/components/shared/footer';
 import FloatingWhatsapp from '@/components/shared/floating-whatsapp';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
+import FirebaseErrorListener from '@/components/FirebaseErrorListener';
+
 
 export const metadata: Metadata = {
   title: 'Afrah Organic Mart - Fresh & Pure',
@@ -28,13 +31,16 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased'
         )}
       >
-        <div className="relative flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
-        <Toaster />
-        <FloatingWhatsapp />
+        <FirebaseClientProvider>
+          <div className="relative flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+          <Toaster />
+          <FloatingWhatsapp />
+          <FirebaseErrorListener />
+        </FirebaseClientProvider>
       </body>
     </html>
   );

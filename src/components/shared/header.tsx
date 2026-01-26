@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart, Menu, Search, ShoppingCart, User, X } from 'lucide-react';
+import { Heart, Menu, Search, ShoppingCart, User, X, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import Logo from './logo';
 import { IconBadge } from '../ui/icon-badge';
 import { siteConfig } from '@/lib/data';
+import { useUser } from '@/firebase';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -19,6 +20,7 @@ const navLinks = [
 export default function Header() {
   // Placeholder for cart items count
   const cartItemCount = 1;
+  const { user, isAdmin } = useUser();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -99,8 +101,15 @@ export default function Header() {
               </IconBadge>
             </Link>
           </Button>
+          {isAdmin && (
+             <Button variant="ghost" size="icon" asChild>
+              <Link href="/admin" aria-label="Admin Panel">
+                <Shield className="h-5 w-5 text-primary" />
+              </Link>
+            </Button>
+          )}
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/account" aria-label="My Account">
+            <Link href={user ? "/account" : "/admin/login"} aria-label="My Account">
               <User className="h-5 w-5" />
             </Link>
           </Button>

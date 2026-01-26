@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "Represents a customer order.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The ID of the user who placed the order (if logged in)." },
+        "productName": { "type": "string" },
+        "quantity": { "type": "number" },
+        "totalPrice": { "type": "number" },
+        "customerName": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"], "description": "The status of the order." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "The timestamp when the order was created." }
+      },
+      "required": ["productName", "quantity", "totalPrice", "customerName", "address", "phone", "paymentMethod", "createdAt", "status"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's profile information.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" }
+      },
+      "required": ["email"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Represents an admin user flag.",
+      "type": "object",
+      "properties": {
+        "isAdmin": {
+          "type": "boolean",
+          "description": "Set to true if the user is an admin."
+        }
+      },
+      "required": ["isAdmin"]
+    }
+  },
+  "auth": {
+    "providers": ["email"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/backend/entities/UserProfile" },
+      "description": "Stores user profile information."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/backend/entities/Order" },
+      "description": "Stores all customer orders."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/backend/entities/Admin" },
+      "description": "List of admin user UIDs."
+    }
+  }
+}
