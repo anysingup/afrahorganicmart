@@ -11,7 +11,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
 // This is the schema for the data we expect from the frontend form.
-export const CreateOrderInputSchema = z.object({
+const CreateOrderInputSchema = z.object({
   productName: z.string().describe('The name of the product being ordered.'),
   quantity: z.number().describe('The quantity of the product being ordered.'),
   totalPrice: z.number().describe('The total price of the order.'),
@@ -23,7 +23,7 @@ export const CreateOrderInputSchema = z.object({
 export type CreateOrderInput = z.infer<typeof CreateOrderInputSchema>;
 
 // This is the schema for the data we'll return to the frontend.
-export const CreateOrderOutputSchema = z.object({
+const CreateOrderOutputSchema = z.object({
   success: z.boolean().describe('Whether the order was created successfully.'),
   message: z.string().describe('A message to show to the user.'),
   orderId: z.string().optional().describe('The ID of the created order.'),
