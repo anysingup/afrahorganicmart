@@ -15,7 +15,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, className }: ProductCardProps) {
-  const productImage = PlaceHolderImages.find(p => p.id === product.image);
+  const productImage = PlaceHolderImages.find(p => p.id === product.images[0]);
   const hasDiscount = product.originalPrice && product.originalPrice > product.price;
 
   return (

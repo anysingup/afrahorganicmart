@@ -55,6 +55,18 @@
       "imageHint": "ajwa dates"
     },
     {
+      "id": "product-ajwa-2",
+      "description": "Premium Ajwa dates on a plate.",
+      "imageUrl": "https://images.unsplash.com/photo-1629738601425-494c3d6ba3e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxkYXRlcyUyMGZydWl0fGVufDB8fHx8MTc2OTQ1MzUwMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ajwa dates"
+    },
+    {
+      "id": "product-ajwa-3",
+      "description": "A handful of Premium Ajwa dates.",
+      "imageUrl": "https://images.unsplash.com/photo-1614061811858-dde54a522f5e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkYXRlcyUyMGZydWl0fGVufDB8fHx8MTc2OTQ1MzUwMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ajwa dates"
+    },
+    {
       "id": "product-medjool",
       "description": "Jumbo Medjool dates.",
       "imageUrl": "https://images.unsplash.com/photo-1710228010206-934856204165?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtZWRqb29sJTIwZGF0ZXN8ZW58MHx8fHwxNzY5Mzg0Mjc4fDA&ixlib=rb-4.1.0&q=80&w=1080",
