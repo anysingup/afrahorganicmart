@@ -5,9 +5,11 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, onSnapshot, Firestore } from 'firebase/firestore';
 
 import { useAuth, useFirestore } from '@/firebase/provider';
+import type { UserProfile } from '@/lib/types';
 
 interface UserHook {
   user: User | null;
+  profile: UserProfile | null;
   isAdmin: boolean;
   loading: boolean;
 }
@@ -16,6 +18,7 @@ export const useUser = (): UserHook => {
   const auth = useAuth();
   const firestore = useFirestore();
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
@@ -29,6 +32,7 @@ export const useUser = (): UserHook => {
       setUser(user);
       if (!user) {
         setIsAdmin(false);
+        setProfile(null);
         setLoading(false);
       }
     });
@@ -38,25 +42,40 @@ export const useUser = (): UserHook => {
 
   useEffect(() => {
     if (!user || !firestore) {
-      // If there's no user, loading is finished for the admin check.
       if (!user) setLoading(false);
       return;
     }
 
     setLoading(true);
     const adminDocRef = doc(firestore, 'admins', user.uid);
+    const profileDocRef = doc(firestore, 'users', user.uid);
 
-    const unsubscribeSnapshot = onSnapshot(adminDocRef, (docSnap) => {
+    const unsubAdmin = onSnapshot(adminDocRef, (docSnap) => {
       setIsAdmin(docSnap.exists() && docSnap.data().isAdmin === true);
-      setLoading(false);
     }, (error) => {
-        console.error("Error checking admin status:", error);
-        setIsAdmin(false);
-        setLoading(false);
+      console.error("Error checking admin status:", error);
+      setIsAdmin(false);
     });
 
-    return () => unsubscribeSnapshot();
+    const unsubProfile = onSnapshot(profileDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setProfile(docSnap.data() as UserProfile);
+      } else {
+        setProfile(null);
+      }
+       // We can set loading to false here as this is the 'main' user data
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching user profile:", error);
+      setProfile(null);
+      setLoading(false);
+    });
+
+    return () => {
+        unsubAdmin();
+        unsubProfile();
+    };
   }, [user, firestore]);
 
-  return useMemo(() => ({ user, isAdmin, loading }), [user, isAdmin, loading]);
+  return useMemo(() => ({ user, profile, isAdmin, loading }), [user, profile, isAdmin, loading]);
 };

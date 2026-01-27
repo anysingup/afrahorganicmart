@@ -59,7 +59,8 @@
       "type": "object",
       "properties": {
         "email": { "type": "string", "format": "email" },
-        "displayName": { "type": "string" }
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string", "format": "uri" }
       },
       "required": ["email"]
     },
@@ -74,30 +75,95 @@
         }
       },
       "required": ["isAdmin"]
+    },
+    "WishlistItem": {
+      "title": "Wishlist Item",
+      "description": "A reference to a product in a user's wishlist.",
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string"
+        },
+        "addedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "productId",
+        "addedAt"
+      ]
+    },
+    "CartItem": {
+      "title": "Cart Item",
+      "description": "Represents a product in a user's shopping cart.",
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "number"
+        },
+        "addedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "productId",
+        "quantity",
+        "addedAt"
+      ]
     }
   },
   "auth": {
-    "providers": ["email"]
+    "providers": [
+      "email",
+      "google.com"
+    ]
   },
   "firestore": {
     "/users/{userId}": {
-      "schema": { "$ref": "#/backend/entities/UserProfile" },
+      "schema": {
+        "$ref": "#/backend/entities/UserProfile"
+      },
       "description": "Stores user profile information."
     },
+    "/users/{userId}/wishlist/{productId}": {
+      "schema": {
+        "$ref": "#/backend/entities/WishlistItem"
+      },
+      "description": "Stores a user's wishlisted products. The document ID is the product ID."
+    },
+    "/users/{userId}/cart/{cartItemId}": {
+      "schema": {
+        "$ref": "#/backend/entities/CartItem"
+      },
+      "description": "Stores items in a user's shopping cart."
+    },
     "/orders/{orderId}": {
-      "schema": { "$ref": "#/backend/entities/Order" },
+      "schema": {
+        "$ref": "#/backend/entities/Order"
+      },
       "description": "Stores all customer orders."
     },
     "/admins/{userId}": {
-      "schema": { "$ref": "#/backend/entities/Admin" },
+      "schema": {
+        "$ref": "#/backend/entities/Admin"
+      },
       "description": "List of admin user UIDs."
     },
     "/products/{productId}": {
-      "schema": { "$ref": "#/backend/entities/Product" },
+      "schema": {
+        "$ref": "#/backend/entities/Product"
+      },
       "description": "Stores all products available in the store."
     },
     "/contacts/{contactId}": {
-      "schema": { "$ref": "#/backend/entities/ContactMessage" },
+      "schema": {
+        "$ref": "#/backend/entities/ContactMessage"
+      },
       "description": "Stores messages submitted from the contact form."
     }
   }

@@ -13,6 +13,14 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read, write: if isOwner(userId) || isAdmin();
+
+      match /wishlist/{productId} {
+        allow read, write, delete: if isOwner(userId);
+      }
+
+      match /cart/{cartItemId} {
+        allow read, write, delete: if isOwner(userId);
+      }
     }
 
     match /admins/{userId} {
@@ -26,7 +34,7 @@ service cloud.firestore {
       // Admins can see and manage all orders
       allow read, list, update, delete: if isAdmin();
       // Logged-in users can see their own orders
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && resource.data.userId != null && request.auth.uid == resource.data.userId;
     }
 
     match /products/{productId} {

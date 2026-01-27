@@ -55,3 +55,22 @@ export interface ContactMessage {
   message: string;
   createdAt: Timestamp;
 }
+
+export interface UserProfile {
+  displayName: string;
+  email: string;
+  photoURL?: string;
+}
+
+export interface WishlistItem {
+  id: string;
+  productId: string;
+  addedAt: Timestamp;
+}
+
+export interface CartItem {
+  id: string;
+  productId: string;
+  quantity: number;
+  addedAt: Timestamp;
+}

@@ -109,7 +109,7 @@ export default function Header() {
             </Button>
           )}
           <Button variant="ghost" size="icon" asChild>
-            <Link href={user ? "/account" : "/admin/login"} aria-label="My Account">
+            <Link href={user ? "/account" : "/login"} aria-label="My Account">
               <User className="h-5 w-5" />
             </Link>
           </Button>
