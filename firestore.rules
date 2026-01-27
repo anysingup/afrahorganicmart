@@ -39,14 +39,19 @@ service cloud.firestore {
       allow read, list, update, delete: if isAdmin();
       // Logged-in users can see their own orders, and list their own orders
       allow read: if request.auth != null && resource.data.userId != null && request.auth.uid == resource.data.userId;
-      allow list: if request.auth != null && request.query.where.userId == request.auth.uid;
+      allow list: if request.auth != null && request.query.where[0][2] == request.auth.uid;
     }
 
     match /products/{productId} {
       // Everyone should be able to read products for the storefront
       allow read: if true;
-      // Only admins can create, update, and delete products
-      allow write: if isAdmin();
+      // Only admins can create and delete products
+      allow create, delete: if isAdmin();
+      // Admins can update any field.
+      // Users can only update rating and reviews fields for submitting a rating.
+      allow update: if isAdmin() || 
+        (request.auth != null && 
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'reviews']));
     }
 
     match /contacts/{contactId} {
