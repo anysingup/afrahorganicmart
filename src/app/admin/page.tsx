@@ -64,14 +64,14 @@ export default function AdminDashboard() {
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Customer</TableHead>
-                <TableHead>Product</TableHead>
+                <TableHead>Product(s)</TableHead>
                 <TableHead className="text-right">Total</TableHead>
                 <TableHead className="text-center">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {orders && orders.length > 0 ? (
-                [...orders].sort((a, b) => b.createdAt.seconds - a.createdAt.seconds).slice(0,5).map((order) => (
+                [...orders].sort((a, b) => b.createdAt.seconds - b.createdAt.seconds).slice(0,5).map((order) => (
                   <TableRow key={order.id}>
                     <TableCell>
                       {order.createdAt?.seconds 
@@ -83,7 +83,14 @@ export default function AdminDashboard() {
                       <div className="font-medium">{order.customerName}</div>
                       <div className="text-sm text-muted-foreground">{order.phone}</div>
                     </TableCell>
-                    <TableCell>{order.productName} (x{order.quantity})</TableCell>
+                    <TableCell>
+                      {order.items[0].productName}
+                      {order.items.length > 1 && (
+                        <span className="text-xs text-muted-foreground ml-1">
+                          + {order.items.length - 1} more
+                        </span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">৳{order.totalPrice.toFixed(2)}</TableCell>
                     <TableCell className="text-center">
                       <Badge variant={getBadgeVariant(order.status)}>{order.status}</Badge>

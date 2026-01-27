@@ -74,7 +74,7 @@ export default function SearchBar() {
             {filteredProducts.map(product => (
               <Link
                 key={product.id}
-                href={`/product/${product.slug}`}
+                href={`/product/${product.id}`}
                 className="flex items-center gap-4 p-2 hover:bg-accent"
                 onClick={() => {
                     setSearchQuery('');

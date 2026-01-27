@@ -33,11 +33,17 @@ export interface Testimonial {
   avatar: string;
 }
 
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+}
+
 export interface Order {
     id?: string;
     userId: string | null;
-    productName: string;
-    quantity: number;
+    items: OrderItem[];
     totalPrice: number;
     customerName: string;
     address: string;

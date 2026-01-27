@@ -134,7 +134,7 @@ export default function Home() {
               <span className="text-xl text-muted-foreground line-through">৳1500</span>
             </div>
              <Button asChild size="lg" className="mt-8">
-              <Link href="/product/premium-ajwa-dates">Buy Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
+              <Link href="/shop">Shop Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
           </div>
           <div className="relative h-80 w-full rounded-lg overflow-hidden shadow-lg">

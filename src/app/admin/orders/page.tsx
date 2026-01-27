@@ -95,7 +95,7 @@ export default function OrdersPage() {
             <TableRow>
               <TableHead>Date</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead>Product</TableHead>
+              <TableHead>Product(s)</TableHead>
               <TableHead className="text-right">Total</TableHead>
               <TableHead className="text-center">Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -116,7 +116,15 @@ export default function OrdersPage() {
                     <div className="text-sm text-muted-foreground">{order.phone}</div>
                     <div className="text-sm text-muted-foreground">{order.address}</div>
                   </TableCell>
-                  <TableCell>{order.productName} (x{order.quantity})</TableCell>
+                  <TableCell>
+                    <ul className="list-disc pl-4 space-y-1">
+                      {order.items.map((item, index) => (
+                        <li key={index}>
+                          {item.productName} (x{item.quantity})
+                        </li>
+                      ))}
+                    </ul>
+                  </TableCell>
                   <TableCell className="text-right">৳{order.totalPrice.toFixed(2)}</TableCell>
                   <TableCell className="text-center">
                     <Badge variant={getBadgeVariant(order.status)}>{order.status}</Badge>

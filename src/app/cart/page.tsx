@@ -102,40 +102,41 @@ export default function CartPage() {
   });
   
   async function onSubmit(data: z.infer<typeof formSchema>) {
-     if (!firestore || !user || !cartProducts || cartProducts.length === 0) {
-      toast({ variant: "destructive", title: "Your cart is empty or something went wrong."});
+    if (!firestore || !user || !cartProducts || cartProducts.length === 0) {
+      toast({ variant: "destructive", title: "Your cart is empty or something went wrong." });
       return;
     }
     setIsSubmitting(true);
 
-    const ordersCollection = collection(firestore, 'orders');
-    
-    const orderPromises = cartProducts.map(item => {
-        const orderDetails = {
-          productName: item.name,
-          quantity: item.quantity,
-          totalPrice: item.price * item.quantity,
-          customerName: data.name,
-          address: data.address,
-          phone: data.phone,
-          paymentMethod: data.paymentMethod,
-          status: 'Pending' as const,
-          createdAt: serverTimestamp(),
-          userId: user.uid,
-        };
-        return addDoc(ordersCollection, orderDetails).catch(e => {
-            const permissionError = new FirestorePermissionError({
-                path: 'orders',
-                operation: 'create',
-                requestResourceData: orderDetails,
-            });
-            errorEmitter.emit('permission-error', permissionError);
-            throw e; // re-throw to be caught by Promise.all
-        });
-    });
+    const newOrder = {
+        userId: user.uid,
+        customerName: data.name,
+        address: data.address,
+        phone: data.phone,
+        paymentMethod: data.paymentMethod,
+        items: cartProducts.map(item => ({
+            productId: item.id,
+            productName: item.name,
+            quantity: item.quantity,
+            price: item.price,
+        })),
+        totalPrice: total,
+        status: 'Pending' as const,
+        createdAt: serverTimestamp(),
+    };
 
     try {
-        await Promise.all(orderPromises);
+        const ordersCollection = collection(firestore, 'orders');
+        addDoc(ordersCollection, newOrder)
+          .catch((e) => {
+              const permissionError = new FirestorePermissionError({
+                path: 'orders',
+                operation: 'create',
+                requestResourceData: newOrder,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+            throw e; // re-throw to be caught by the main try-catch
+          });
 
         // Clear the cart AND update sales counts
         const batch = writeBatch(firestore);
@@ -143,7 +144,6 @@ export default function CartPage() {
             const cartDocRef = doc(firestore, `users/${user.uid}/cart`, item.cartItemId);
             batch.delete(cartDocRef);
 
-            // Increment sales count for the purchased product
             const productRef = doc(firestore, 'products', item.id);
             batch.update(productRef, { sales: increment(item.quantity) });
         });
@@ -151,13 +151,13 @@ export default function CartPage() {
 
         toast({
             title: 'Order Placed!',
-            description: "We've received your orders and will process them shortly.",
+            description: "We've received your order and will process it shortly.",
         });
         form.reset();
         queryClient.invalidateQueries({ queryKey: ['cart', user?.uid] });
 
     } catch (error) {
-        // Error toast is handled by the emitter
+        // Error toast is handled by the emitter, so no need for an extra toast here
     } finally {
         setIsSubmitting(false);
     }

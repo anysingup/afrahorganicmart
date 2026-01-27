@@ -94,7 +94,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
     <Card className={cn("group overflow-hidden relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1", className)}>
       <CardContent className="p-0">
         <div className="relative">
-          <Link href={`/product/${product.slug}`} className="block">
+          <Link href={`/product/${product.id}`} className="block">
             <div className="aspect-square w-full overflow-hidden bg-muted">
                {firstImage && (
                 <Image
@@ -126,7 +126,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
         <div className="p-4 space-y-2">
            <p className="text-sm text-muted-foreground">{product.category}</p>
            <h3 className="font-semibold text-lg truncate" title={product.name}>
-            <Link href={`/product/${product.slug}`}>{product.name}</Link>
+            <Link href={`/product/${product.id}`}>{product.name}</Link>
            </h3>
 
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
