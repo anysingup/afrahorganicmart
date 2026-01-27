@@ -42,7 +42,7 @@ export const useUser = (): UserHook => {
 
   useEffect(() => {
     if (!user || !firestore) {
-      if (!user) setLoading(false);
+      if(user === null) setLoading(false);
       return;
     }
 
