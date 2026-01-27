@@ -48,10 +48,10 @@ service cloud.firestore {
       // Only admins can create and delete products
       allow create, delete: if isAdmin();
       // Admins can update any field.
-      // Users can only update rating and reviews fields for submitting a rating.
+      // Users can only update rating, reviews, and sales fields.
       allow update: if isAdmin() || 
         (request.auth != null && 
-         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'reviews']));
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'reviews', 'sales']));
     }
 
     match /contacts/{contactId} {
