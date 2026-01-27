@@ -14,6 +14,8 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 import { useAuth, useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
@@ -29,7 +31,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Logo from '@/components/shared/logo';
+import { siteConfig } from '@/lib/data';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -132,7 +134,16 @@ export default function LoginPage() {
       <Card className="w-full max-w-md mx-4">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex justify-center">
-            <Logo />
+            <Link href="/">
+              <Image
+                src="https://i.postimg.cc/t4L6n5Dv/Chat-GPT-Image-Jan-24-2026-01-59-32-PM.jpg"
+                alt={`${siteConfig.name} Logo`}
+                width={140}
+                height={40}
+                priority
+                className="object-contain"
+              />
+            </Link>
           </div>
           <CardTitle className="font-headline text-2xl">Welcome Back</CardTitle>
           <CardDescription>Login or create an account to continue.</CardDescription>

@@ -7,6 +7,8 @@ import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Loader2, LogIn } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 import { useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
@@ -21,7 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Logo from '@/components/shared/logo';
+import { siteConfig } from '@/lib/data';
 
 
 const formSchema = z.object({
@@ -77,7 +79,16 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex justify-center">
-                <Logo/>
+                <Link href="/">
+                  <Image
+                    src="https://i.postimg.cc/t4L6n5Dv/Chat-GPT-Image-Jan-24-2026-01-59-32-PM.jpg"
+                    alt={`${siteConfig.name} Logo`}
+                    width={140}
+                    height={40}
+                    priority
+                    className="object-contain"
+                  />
+                </Link>
             </div>
           <CardTitle className="font-headline text-2xl">Admin Panel Login</CardTitle>
           <CardDescription>Enter your credentials to access the dashboard.</CardDescription>
