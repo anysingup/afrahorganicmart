@@ -14,10 +14,11 @@ type EditProductPageProps = {
 };
 
 export default function EditProductPage({ params }: EditProductPageProps) {
+    const { id } = params;
     const firestore = useFirestore();
     const productRef = useMemo(() => (
-        firestore ? doc(firestore, "products", params.id) : null
-    ), [firestore, params.id]);
+        firestore ? doc(firestore, "products", id) : null
+    ), [firestore, id]);
     const { data: product, loading } = useDoc<Product>(productRef);
 
     if (loading) {

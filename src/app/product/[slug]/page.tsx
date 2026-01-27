@@ -18,6 +18,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore, useUser, useCollection, useDoc } from '@/firebase';
+import { cn } from '@/lib/utils';
 
 type ProductPageProps = {
   params: {
@@ -32,11 +33,12 @@ export default function ProductPage({ params }: ProductPageProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const firestore = useFirestore();
   const { user } = useUser();
+  const { slug } = params;
 
   const productQuery = useMemo(() => {
     if (!firestore) return null;
-    return query(collection(firestore, 'products'), where('slug', '==', params.slug), limit(1));
-  }, [firestore, params.slug]);
+    return query(collection(firestore, 'products'), where('slug', '==', slug), limit(1));
+  }, [firestore, slug]);
 
   const { data: productData, loading } = useCollection<Product>(productQuery);
   const product = productData?.[0];
