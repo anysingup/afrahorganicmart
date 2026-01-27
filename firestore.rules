@@ -28,5 +28,12 @@ service cloud.firestore {
       // Logged-in users can see their own orders
       allow read: if request.auth != null && request.auth.uid == resource.data.userId;
     }
+
+    match /products/{productId} {
+      // Everyone should be able to read products for the storefront
+      allow read: if true;
+      // Only admins can create, update, and delete products
+      allow write: if isAdmin();
+    }
   }
 }

@@ -1,5 +1,26 @@
 {
   "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Represents a product in the store.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "price": { "type": "number" },
+        "originalPrice": { "type": "number" },
+        "rating": { "type": "number" },
+        "reviews": { "type": "number" },
+        "isNew": { "type": "boolean" },
+        "stock": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "slug", "description", "category", "images", "price", "stock", "rating", "reviews"]
+    },
     "Order": {
       "title": "Order",
       "description": "Represents a customer order.",
@@ -56,6 +77,10 @@
     "/admins/{userId}": {
       "schema": { "$ref": "#/backend/entities/Admin" },
       "description": "List of admin user UIDs."
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/backend/entities/Product" },
+      "description": "Stores all products available in the store."
     }
   }
 }

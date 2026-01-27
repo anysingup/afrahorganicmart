@@ -4,6 +4,7 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
+  description: string;
   category: string;
   images: string[];
   price: number;
@@ -12,6 +13,8 @@ export interface Product {
   reviews: number;
   isNew?: boolean;
   stock: number;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
 
 export interface Category {
