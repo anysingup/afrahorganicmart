@@ -67,9 +67,6 @@ export default function Header() {
                   </SheetClose>
                 ))}
               </nav>
-              <div className="relative mt-8">
-                <SearchBar />
-              </div>
               <div className="mt-auto pt-8">
                 <a href={`tel:${siteConfig.phone}`} className="text-primary font-bold">{`Call Us: ${siteConfig.phone}`}</a>
               </div>
@@ -124,6 +121,10 @@ export default function Header() {
             </Link>
           </Button>
         </div>
+      </div>
+      {/* Mobile Search Bar */}
+      <div className="container mx-auto px-4 pb-3 md:hidden">
+        <SearchBar />
       </div>
     </header>
   );
