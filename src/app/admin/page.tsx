@@ -26,6 +26,23 @@ export default function AdminDashboard() {
   ), [firestore]);
   const { data: orders, loading } = useCollection<Order>(ordersCollection);
 
+  const getBadgeVariant = (status: Order['status']): 'default' | 'secondary' | 'destructive' | 'outline' => {
+    switch (status) {
+      case 'Pending':
+        return 'secondary';
+      case 'Processing':
+        return 'default';
+      case 'Shipped':
+        return 'outline';
+      case 'Delivered':
+        return 'default';
+      case 'Cancelled':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
@@ -69,7 +86,7 @@ export default function AdminDashboard() {
                     <TableCell>{order.productName} (x{order.quantity})</TableCell>
                     <TableCell className="text-right">৳{order.totalPrice.toFixed(2)}</TableCell>
                     <TableCell className="text-center">
-                      <Badge>{order.status}</Badge>
+                      <Badge variant={getBadgeVariant(order.status)}>{order.status}</Badge>
                     </TableCell>
                   </TableRow>
                 ))

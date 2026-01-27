@@ -30,7 +30,7 @@ export default function Home() {
   
   const bestSellersQuery = useMemo(() => {
     if (!firestore) return null;
-    return query(collection(firestore, 'products'), orderBy('createdAt', 'desc'), limit(4));
+    return query(collection(firestore, 'products'), orderBy('sales', 'desc'), limit(4));
   }, [firestore]);
   
   

@@ -2,13 +2,18 @@
 
 import Link from 'next/link';
 import { Heart, Menu, Search, ShoppingCart, User, X, Shield } from 'lucide-react';
+import { useMemo } from 'react';
+import { collection } from 'firebase/firestore';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import Logo from './logo';
 import { IconBadge } from '../ui/icon-badge';
 import { siteConfig } from '@/lib/data';
-import { useUser } from '@/firebase';
+import { useUser, useFirestore, useCollection } from '@/firebase';
+import type { CartItem } from '@/lib/types';
+
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -17,9 +22,17 @@ const navLinks = [
 ];
 
 export default function Header() {
-  // Placeholder for cart items count
-  const cartItemCount = 1;
   const { user, isAdmin } = useUser();
+  const firestore = useFirestore();
+
+  const cartCollectionRef = useMemo(() => {
+    if (!user || !firestore) return null;
+    return collection(firestore, `users/${user.uid}/cart`);
+  }, [user, firestore]);
+
+  const { data: cartItems } = useCollection<CartItem>(cartCollectionRef);
+  const cartItemCount = cartItems?.length || 0;
+
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
