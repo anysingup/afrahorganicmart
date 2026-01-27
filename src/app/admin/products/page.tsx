@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
-import { PlusCircle, MoreHorizontal, Trash2, Loader2 } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Trash2, Loader2, Edit } from 'lucide-react';
 
 import { useFirestore, useCollection } from '@/firebase';
 import type { Product } from '@/lib/types';
@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -153,10 +153,10 @@ export default function ProductsPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                              <Link href={`/admin/products/edit/${product.id}`}>Edit</Link>
+                              <Link href={`/admin/products/edit/${product.id}`}><Edit className="mr-2 h-4 w-4" />Edit</Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setProductToDelete(product)} className="text-destructive">
+                            <DropdownMenuItem onClick={() => setProductToDelete(product)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
                             </DropdownMenuItem>
@@ -191,8 +191,9 @@ export default function ProductsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteProduct} disabled={isDeleting}>
-              {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Continue'}
+            <AlertDialogAction onClick={handleDeleteProduct} disabled={isDeleting} className={buttonVariants({ variant: "destructive" })}>
+              {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

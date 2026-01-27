@@ -35,5 +35,12 @@ service cloud.firestore {
       // Only admins can create, update, and delete products
       allow write: if isAdmin();
     }
+
+    match /contacts/{contactId} {
+      // Anyone can submit a contact message
+      allow create: if true;
+      // Only admins can read and delete messages
+      allow read, list, delete: if isAdmin();
+    }
   }
 }

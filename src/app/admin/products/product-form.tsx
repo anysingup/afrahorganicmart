@@ -71,6 +71,24 @@ export function ProductForm({ initialData }: ProductFormProps) {
     },
   });
 
+  const handleSuccess = (productName: string, isUpdate: boolean) => {
+    toast({ 
+        title: isUpdate ? 'Product Updated' : 'Product Created', 
+        description: `"${productName}" has been ${isUpdate ? 'updated' : 'created'}.` 
+    });
+    router.push('/admin/products');
+    router.refresh();
+  }
+
+  const handleError = (error: any, data: any, isUpdate: boolean) => {
+    const permissionError = new FirestorePermissionError({
+        path: isUpdate && initialData ? `products/${initialData.id}` : 'products',
+        operation: isUpdate ? 'update' : 'create',
+        requestResourceData: data,
+    });
+    errorEmitter.emit('permission-error', permissionError);
+  }
+
   const onSubmit = async (data: ProductFormValues) => {
     if (!firestore) {
         toast({ variant: "destructive", title: "Database service not available." });
@@ -90,32 +108,21 @@ export function ProductForm({ initialData }: ProductFormProps) {
         updatedAt: serverTimestamp(),
     };
 
-    try {
-        if (initialData) {
-            // Update existing product
-            const productRef = doc(firestore, 'products', initialData.id);
-            await updateDoc(productRef, productData);
-            toast({ title: 'Product Updated', description: `"${data.name}" has been updated.` });
-        } else {
-            // Create new product
-            const productsCollection = collection(firestore, 'products');
-            await addDoc(productsCollection, {
-                ...productData,
-                createdAt: serverTimestamp(),
-            });
-            toast({ title: 'Product Created', description: `"${data.name}" has been created.` });
-        }
-        router.push('/admin/products');
-        router.refresh(); // Refresh server components
-    } catch (e: any) {
-        const permissionError = new FirestorePermissionError({
-            path: initialData ? `products/${initialData.id}` : 'products',
-            operation: initialData ? 'update' : 'create',
-            requestResourceData: productData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-    } finally {
-        setIsSubmitting(false);
+    if (initialData) {
+        // Update existing product
+        const productRef = doc(firestore, 'products', initialData.id);
+        updateDoc(productRef, productData)
+            .then(() => handleSuccess(data.name, true))
+            .catch((e) => handleError(e, productData, true))
+            .finally(() => setIsSubmitting(false));
+    } else {
+        // Create new product
+        const productsCollection = collection(firestore, 'products');
+        const newProductData = { ...productData, createdAt: serverTimestamp() };
+        addDoc(productsCollection, newProductData)
+            .then(() => handleSuccess(data.name, false))
+            .catch((e) => handleError(e, newProductData, false))
+            .finally(() => setIsSubmitting(false));
     }
   };
 

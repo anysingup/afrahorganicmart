@@ -6,8 +6,9 @@ export const siteConfig = {
     email: "contact@afrahorganic.com",
     address: "Dhaka, Bangladesh",
     social: {
-        facebook: "https://facebook.com",
-        instagram: "https://instagram.com",
+        facebook: "https://www.facebook.com/profile.php?id=61587084541625",
+        instagram: "https://www.instagram.com/afrahorganicmart/",
+        tiktok: "https://www.tiktok.com/@afrahorganicmart",
     },
 };
 

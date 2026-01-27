@@ -1,5 +1,19 @@
 {
   "entities": {
+    "ContactMessage": {
+      "title": "Contact Message",
+      "description": "Represents a message submitted through the contact form.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "message", "createdAt"]
+    },
     "Product": {
       "title": "Product",
       "description": "Represents a product in the store.",
@@ -81,6 +95,10 @@
     "/products/{productId}": {
       "schema": { "$ref": "#/backend/entities/Product" },
       "description": "Stores all products available in the store."
+    },
+    "/contacts/{contactId}": {
+      "schema": { "$ref": "#/backend/entities/ContactMessage" },
+      "description": "Stores messages submitted from the contact form."
     }
   }
 }

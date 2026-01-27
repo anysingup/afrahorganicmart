@@ -3,6 +3,19 @@ import { Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react';
 import Logo from './logo';
 import { siteConfig } from '@/lib/data';
 
+function TiktokIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 28.54 32.55"
+      {...props}
+    >
+      <path d="M28.54,11.39a3.86,3.86,0,0,0-3.33-3.48V4.49A4.49,4.49,0,0,0,20.72,0H4.49A4.49,4.49,0,0,0,0,4.49V28.06a4.49,4.49,0,0,0,4.49,4.49H20.72a4.49,4.49,0,0,0,4.49-4.49V19.18a4.63,4.63,0,0,0,3.33-4.27V11.53Zm-5.32,17.1a2,2,0,0,1-2,2H5.16a2,2,0,0,1-2-2V5.16a2,2,0,0,1,2-2H17.29v17a4.4,4.4,0,0,1-4.4,4.4H4.49V22.25h8.4a.67.67,0,0,0,.67-.67V7.91h3.73Z" />
+    </svg>
+  );
+}
+
+
 export default function Footer() {
   return (
     <footer className="bg-card text-card-foreground border-t">
@@ -62,6 +75,10 @@ export default function Footer() {
               <Link href={siteConfig.social.instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                 <Instagram className="h-6 w-6" />
                 <span className="sr-only">Instagram</span>
+              </Link>
+               <Link href={siteConfig.social.tiktok} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+                <TiktokIcon className="h-6 w-6 fill-current" />
+                <span className="sr-only">TikTok</span>
               </Link>
             </div>
           </div>
