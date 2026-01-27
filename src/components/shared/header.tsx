@@ -1,18 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart, Menu, Search, ShoppingCart, User, X, Shield } from 'lucide-react';
+import { Heart, Menu, ShoppingCart, User, X, Shield } from 'lucide-react';
 import { useMemo } from 'react';
 import { collection } from 'firebase/firestore';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import Logo from './logo';
 import { IconBadge } from '../ui/icon-badge';
 import { siteConfig } from '@/lib/data';
 import { useUser, useFirestore, useCollection } from '@/firebase';
 import type { CartItem } from '@/lib/types';
+import SearchBar from './search-bar';
 
 
 const navLinks = [
@@ -68,8 +68,7 @@ export default function Header() {
                 ))}
               </nav>
               <div className="relative mt-8">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input placeholder="Search for products..." className="pl-10" />
+                <SearchBar />
               </div>
               <div className="mt-auto pt-8">
                 <a href={`tel:${siteConfig.phone}`} className="text-primary font-bold">{`Call Us: ${siteConfig.phone}`}</a>
@@ -97,9 +96,8 @@ export default function Header() {
         </nav>
         
         <div className="flex items-center gap-2 md:gap-4">
-          <div className="hidden md:block relative w-64">
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-             <Input placeholder="Search..." className="pl-10" />
+          <div className="hidden md:block">
+            <SearchBar />
           </div>
           <Button variant="ghost" size="icon" asChild>
             <Link href="/wishlist" aria-label="Wishlist">
