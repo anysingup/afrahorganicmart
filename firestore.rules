@@ -37,8 +37,9 @@ service cloud.firestore {
       allow create: if true;
       // Admins can see and manage all orders
       allow read, list, update, delete: if isAdmin();
-      // Logged-in users can see their own orders
+      // Logged-in users can see their own orders, and list their own orders
       allow read: if request.auth != null && resource.data.userId != null && request.auth.uid == resource.data.userId;
+      allow list: if request.auth != null && request.query.where.userId == request.auth.uid;
     }
 
     match /products/{productId} {
