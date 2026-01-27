@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
-import { collection, query, where, orderBy } from 'firebase/firestore';
+import { collection, query, where } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { Loader2, LogOut, ShoppingCart, Heart, User as UserIcon, Package } from 'lucide-react';
 
@@ -31,12 +31,20 @@ export default function AccountPage() {
     if (!firestore || !user) return null;
     return query(
       collection(firestore, 'orders'),
-      where('userId', '==', user.uid),
-      orderBy('createdAt', 'desc')
+      where('userId', '==', user.uid)
     );
   }, [firestore, user]);
 
   const { data: orders, loading: ordersLoading } = useCollection<Order>(ordersQuery);
+
+  const sortedOrders = useMemo(() => {
+    if (!orders) return [];
+    return [...orders].sort((a, b) => {
+        const aTime = a.createdAt?.seconds || 0;
+        const bTime = b.createdAt?.seconds || 0;
+        return bTime - aTime;
+    });
+  }, [orders]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -129,9 +137,9 @@ export default function AccountPage() {
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                 )}
-                {!ordersLoading && orders && orders.length > 0 ? (
+                {!ordersLoading && sortedOrders && sortedOrders.length > 0 ? (
                     <Accordion type="single" collapsible className="w-full">
-                        {orders.map((order) => (
+                        {sortedOrders.map((order) => (
                             <AccordionItem value={order.id} key={order.id}>
                                 <AccordionTrigger className="hover:no-underline">
                                     <div className="flex justify-between items-center w-full pr-4 text-sm md:text-base">
