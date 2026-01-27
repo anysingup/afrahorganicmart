@@ -38,7 +38,7 @@ const formSchema = z.object({
   originalPrice: z.coerce.number().optional(),
   stock: z.coerce.number().min(0, { message: 'Stock must be a positive number.' }),
   category: z.string({ required_error: 'Please select a category.' }),
-  images: z.string().min(1, { message: 'Please provide at least one image ID.' }),
+  images: z.string().min(10, { message: 'Please provide at least one valid image URL.' }),
   isNew: z.boolean().default(false),
 });
 
@@ -66,7 +66,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
       originalPrice: initialData?.originalPrice || undefined,
       stock: initialData?.stock || 0,
       category: initialData?.category || '',
-      images: initialData?.images.join(', ') || '',
+      images: initialData?.images.join('\n') || '',
       isNew: initialData?.isNew || false,
     },
   });
@@ -97,7 +97,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
     
     setIsSubmitting(true);
     const slug = createSlug(data.name);
-    const images = data.images.split(',').map(s => s.trim()).filter(Boolean);
+    const images = data.images.split('\n').map(s => s.trim()).filter(Boolean);
 
     const productData = {
         ...data,
@@ -229,12 +229,12 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         name="images"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Product Image ID</FormLabel>
+                                <FormLabel>Product Image URLs</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="e.g., product-ajwa" {...field} />
+                                    <Textarea rows={4} placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg" {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                    Currently, the system uses a central image library. To add a new image, please provide the image URL to the AI assistant, for example: "add a new product image with ID 'new-product-id' and URL 'https://example.com/image.jpg'". Then, use that ID here.
+                                    Enter one image URL per line. The first image will be the main display image. You can add multiple URLs for a carousel.
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>

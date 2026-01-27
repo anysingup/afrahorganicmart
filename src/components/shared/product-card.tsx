@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 interface ProductCardProps {
   product: Product;
@@ -15,7 +14,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, className }: ProductCardProps) {
-  const productImage = PlaceHolderImages.find(p => p.id === product.images[0]);
+  const firstImage = product.images && product.images.length > 0 ? product.images[0] : null;
   const hasDiscount = product.originalPrice && product.originalPrice > product.price;
 
   return (
@@ -23,12 +22,11 @@ export default function ProductCard({ product, className }: ProductCardProps) {
       <CardContent className="p-0">
         <div className="relative">
           <Link href={`/product/${product.slug}`} className="block">
-            <div className="aspect-square w-full overflow-hidden">
-               {productImage && (
+            <div className="aspect-square w-full overflow-hidden bg-muted">
+               {firstImage && (
                 <Image
-                  src={productImage.imageUrl}
+                  src={firstImage}
                   alt={product.name}
-                  data-ai-hint={productImage.imageHint}
                   width={300}
                   height={300}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

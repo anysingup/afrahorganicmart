@@ -8,7 +8,6 @@ import { PlusCircle, MoreHorizontal, Trash2, Loader2, Edit } from 'lucide-react'
 
 import { useFirestore, useCollection } from '@/firebase';
 import type { Product } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import {
   Table,
   TableHeader,
@@ -119,13 +118,13 @@ export default function ProductsPage() {
               )}
               {!loading && products && products.length > 0 ? (
                 products.map((product) => {
-                  const productImage = PlaceHolderImages.find(p => p.id === product.images[0]);
+                  const firstImage = product.images && product.images.length > 0 ? product.images[0] : null;
                   return (
                     <TableRow key={product.id}>
                       <TableCell className="hidden sm:table-cell">
-                        {productImage ? (
+                        {firstImage ? (
                           <Image
-                            src={productImage.imageUrl}
+                            src={firstImage}
                             alt={product.name}
                             width={64}
                             height={64}

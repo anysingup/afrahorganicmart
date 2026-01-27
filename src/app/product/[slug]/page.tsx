@@ -10,7 +10,6 @@ import { Loader2, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
 import { collection, addDoc, serverTimestamp, query, where, limit } from 'firebase/firestore';
 
 import type { Product } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import {
   Carousel,
@@ -153,24 +152,18 @@ export default function ProductPage({ params }: ProductPageProps) {
         <div className="flex flex-col items-center">
             <Carousel className="w-full max-w-md">
                 <CarouselContent>
-                {product.images.map((imgId, index) => {
-                    const productImage = PlaceHolderImages.find(p => p.id === imgId);
-                    return (
+                {product.images.map((imageUrl, index) => (
                     <CarouselItem key={index}>
                         <div className="aspect-square relative">
-                        {productImage && (
-                            <Image
-                                src={productImage.imageUrl}
-                                alt={`${product.name} - image ${index + 1}`}
-                                data-ai-hint={productImage.imageHint}
-                                fill
-                                className="object-cover rounded-lg"
-                            />
-                        )}
+                        <Image
+                            src={imageUrl}
+                            alt={`${product.name} - image ${index + 1}`}
+                            fill
+                            className="object-cover rounded-lg"
+                        />
                         </div>
                     </CarouselItem>
-                    );
-                })}
+                ))}
                 </CarouselContent>
                 <CarouselPrevious className="left-2" />
                 <CarouselNext className="right-2" />
