@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
@@ -43,7 +43,9 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 export default function ProductsPage() {
   const firestore = useFirestore();
-  const productsCollection = firestore ? collection(firestore, 'products') : null;
+  const productsCollection = useMemo(() => (
+    firestore ? collection(firestore, 'products') : null
+  ), [firestore]);
   const { data: products, loading } = useCollection<Product>(productsCollection);
   const { toast } = useToast();
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { collection } from 'firebase/firestore';
 import { format } from 'date-fns';
 
@@ -20,7 +21,9 @@ import type { Order } from '@/lib/types';
 
 export default function AdminDashboard() {
   const firestore = useFirestore();
-  const ordersCollection = firestore ? collection(firestore, 'orders') : null;
+  const ordersCollection = useMemo(() => (
+    firestore ? collection(firestore, 'orders') : null
+  ), [firestore]);
   const { data: orders, loading } = useCollection<Order>(ordersCollection);
 
   if (loading) {

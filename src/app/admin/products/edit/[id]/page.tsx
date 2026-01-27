@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { doc } from "firebase/firestore";
 import { useFirestore, useDoc } from "@/firebase";
 import { ProductForm } from "../../product-form";
@@ -14,7 +15,9 @@ type EditProductPageProps = {
 
 export default function EditProductPage({ params }: EditProductPageProps) {
     const firestore = useFirestore();
-    const productRef = firestore ? doc(firestore, "products", params.id) : null;
+    const productRef = useMemo(() => (
+        firestore ? doc(firestore, "products", params.id) : null
+    ), [firestore, params.id]);
     const { data: product, loading } = useDoc<Product>(productRef);
 
     if (loading) {

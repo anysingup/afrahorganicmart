@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { collection, doc, updateDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { Loader2, MoreHorizontal } from 'lucide-react';
@@ -31,7 +32,9 @@ import { FirestorePermissionError } from '@/firebase/errors';
 export default function OrdersPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
-  const ordersCollection = firestore ? collection(firestore, 'orders') : null;
+  const ordersCollection = useMemo(() => (
+    firestore ? collection(firestore, 'orders') : null
+  ), [firestore]);
   const { data: orders, loading } = useCollection<Order>(ordersCollection);
 
   const updateOrderStatus = (orderId: string, status: Order['status']) => {

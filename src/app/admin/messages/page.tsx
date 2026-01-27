@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { Loader2, Trash2, User, Mail, Phone, MessageSquare } from 'lucide-react';
@@ -33,7 +33,9 @@ import { FirestorePermissionError } from '@/firebase/errors';
 export default function MessagesPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
-  const messagesCollection = firestore ? collection(firestore, 'contacts') : null;
+  const messagesCollection = useMemo(() => (
+    firestore ? collection(firestore, 'contacts') : null
+  ), [firestore]);
   const { data: messages, loading } = useCollection<ContactMessage>(messagesCollection);
 
   const [messageToDelete, setMessageToDelete] = useState<ContactMessage | null>(null);
