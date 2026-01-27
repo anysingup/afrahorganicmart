@@ -105,6 +105,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
         images,
         rating: initialData?.rating ?? 0,
         reviews: initialData?.reviews ?? 0,
+        sales: initialData?.sales ?? 0,
         updatedAt: serverTimestamp(),
     };
 
@@ -231,7 +232,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
                             <FormItem>
                                 <FormLabel>Product Image URLs</FormLabel>
                                 <FormControl>
-                                    <Textarea rows={4} placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg" {...field} />
+                                    <Textarea rows={4} placeholder="https://example.com/image1.jpg
+https://example.com/image2.jpg" {...field} />
                                 </FormControl>
                                 <FormDescription>
                                     Enter one image URL per line. The first image will be the main display image. You can add multiple URLs for a carousel.

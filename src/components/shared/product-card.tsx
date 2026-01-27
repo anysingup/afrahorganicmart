@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Heart, ShoppingCart, Loader2 } from 'lucide-react';
+import { Heart, ShoppingCart, Loader2, Star } from 'lucide-react';
 import { doc, setDoc, deleteDoc, serverTimestamp, addDoc, collection } from 'firebase/firestore';
 import { useMemo, useState } from 'react';
 
@@ -128,6 +128,14 @@ export default function ProductCard({ product, className }: ProductCardProps) {
            <h3 className="font-semibold text-lg truncate" title={product.name}>
             <Link href={`/product/${product.slug}`}>{product.name}</Link>
            </h3>
+
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                <span className="font-semibold text-foreground">
+                {product.reviews > 0 ? (product.rating / product.reviews).toFixed(1) : 'New'}
+                </span>
+                <span>({product.reviews} reviews)</span>
+            </div>
           
           <div className="flex items-baseline gap-2">
             <p className="font-bold text-xl text-primary">৳{product.price}</p>

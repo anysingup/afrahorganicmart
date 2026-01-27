@@ -4,9 +4,9 @@ import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { notFound, useRouter } from 'next/navigation';
 import { Loader2, Minus, Plus, ShoppingCart, Star, Heart } from 'lucide-react';
-import { collection, query, where, limit, addDoc, serverTimestamp, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, limit, addDoc, serverTimestamp, doc, setDoc, deleteDoc, runTransaction } from 'firebase/firestore';
 
-import type { Product } from '@/lib/types';
+import type { Product, UserRating } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Carousel,
@@ -26,11 +26,55 @@ type ProductPageProps = {
   };
 };
 
+const RatingInput = ({
+  userRating,
+  onRatingSubmit,
+  isSubmitting,
+}: {
+  userRating: number;
+  onRatingSubmit: (rating: number) => void;
+  isSubmitting: boolean;
+}) => {
+  const [hoverRating, setHoverRating] = useState(0);
+
+  return (
+    <div className="flex flex-col items-start gap-2">
+      <h3 className="text-lg font-semibold">
+        {userRating > 0 ? 'Update Your Rating' : 'Rate this Product'}
+      </h3>
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => onRatingSubmit(star)}
+            onMouseEnter={() => setHoverRating(star)}
+            onMouseLeave={() => setHoverRating(0)}
+            disabled={isSubmitting}
+            className="disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Star
+              className={cn(
+                'h-7 w-7 transition-colors',
+                (hoverRating || userRating) >= star
+                  ? 'text-yellow-500 fill-yellow-500'
+                  : 'text-gray-300'
+              )}
+            />
+          </button>
+        ))}
+         {isSubmitting && <Loader2 className="h-5 w-5 animate-spin ml-2" />}
+      </div>
+    </div>
+  );
+};
+
+
 export default function ProductPage({ params }: ProductPageProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isRating, setIsRating] = useState(false);
   const firestore = useFirestore();
   const { user } = useUser();
   const { slug } = params;
@@ -51,6 +95,15 @@ export default function ProductPage({ params }: ProductPageProps) {
   const { data: wishlistItem, loading: loadingWishlist } = useDoc(wishlistRef);
   const isInWishlist = !!wishlistItem;
 
+  const userRatingRef = useMemo(() => {
+    if (!firestore || !user || !product) return null;
+    return doc(firestore, `users/${user.uid}/ratedProducts`, product.id);
+  }, [firestore, user, product]);
+
+  const { data: userRatingDoc } = useDoc<UserRating>(userRatingRef);
+  const currentUserRating = userRatingDoc?.rating || 0;
+
+
   if (loading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
@@ -62,6 +115,8 @@ export default function ProductPage({ params }: ProductPageProps) {
   if (!product) {
     notFound();
   }
+
+  const averageRating = product.reviews > 0 ? product.rating / product.reviews : 0;
 
   const handleQuantityChange = (amount: number) => {
     setQuantity((prev) => {
@@ -119,6 +174,54 @@ export default function ProductPage({ params }: ProductPageProps) {
     }
   };
 
+  const handleRatingSubmit = async (newRating: number) => {
+    if (!user || !firestore || !product) {
+      router.push(`/login?redirect=/product/${product.slug}`);
+      return;
+    }
+
+    setIsRating(true);
+    const productRef = doc(firestore, 'products', product.id);
+    const userRatingRef = doc(firestore, `users/${user.uid}/ratedProducts`, product.id);
+
+    try {
+      await runTransaction(firestore, async (transaction) => {
+        const productDoc = await transaction.get(productRef);
+        const userRatingDoc = await transaction.get(userRatingRef);
+
+        if (!productDoc.exists()) {
+          throw 'Product does not exist!';
+        }
+
+        const currentProductData = productDoc.data() as Product;
+        const previousUserRating = userRatingDoc.exists() ? (userRatingDoc.data() as UserRating).rating : 0;
+
+        const newTotalRating = currentProductData.rating - previousUserRating + newRating;
+        const newReviewsCount = previousUserRating === 0 ? currentProductData.reviews + 1 : currentProductData.reviews;
+
+        transaction.update(productRef, {
+          rating: newTotalRating,
+          reviews: newReviewsCount,
+        });
+
+        transaction.set(userRatingRef, { rating: newRating });
+      });
+
+      toast({
+        title: 'Rating Submitted!',
+        description: `You rated this product ${newRating} stars.`,
+      });
+    } catch (e: any) {
+      console.error("Rating transaction failed: ", e);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not submit your rating.',
+      });
+    } finally {
+      setIsRating(false);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
@@ -148,13 +251,18 @@ export default function ProductPage({ params }: ProductPageProps) {
         {/* Right Column: Product Info & Actions */}
         <div>
           <h1 className="font-headline text-3xl md:text-4xl font-bold">{product.name}</h1>
-          <div className="mt-4 flex items-center gap-4">
-            <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className={`h-5 w-5 ${i < Math.round(product.rating) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
-              ))}
+          <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-yellow-500 fill-yellow-400" />
+              <span className="font-bold text-foreground">{averageRating.toFixed(1)}</span>
+              <span>({product.reviews} ratings)</span>
             </div>
-            <span className="text-muted-foreground">{product.reviews} reviews</span>
+            <Separator orientation="vertical" className="h-5" />
+            <div className="flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5 text-primary" />
+              <span className="font-bold text-foreground">{product.sales || 0}</span>
+              <span>sold</span>
+            </div>
           </div>
 
           <div className="mt-6">
@@ -169,6 +277,18 @@ export default function ProductPage({ params }: ProductPageProps) {
           <p className="text-muted-foreground whitespace-pre-wrap">{product.description}</p>
           
           <Separator className="my-8" />
+          
+          {user && (
+            <>
+              <RatingInput
+                userRating={currentUserRating}
+                onRatingSubmit={handleRatingSubmit}
+                isSubmitting={isRating}
+              />
+              <Separator className="my-8" />
+            </>
+          )}
+
 
           <div className="flex items-center gap-4">
             <h3 className="text-lg font-semibold">Quantity:</h3>

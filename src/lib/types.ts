@@ -11,6 +11,7 @@ export interface Product {
   originalPrice?: number;
   rating: number;
   reviews: number;
+  sales: number;
   isNew?: boolean;
   stock: number;
   createdAt?: Timestamp;
@@ -73,4 +74,8 @@ export interface CartItem {
   productId: string;
   quantity: number;
   addedAt: Timestamp;
+}
+
+export interface UserRating {
+  rating: number;
 }

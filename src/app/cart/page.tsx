@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { collection, query, where, getDocs, doc, writeBatch, serverTimestamp, addDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, writeBatch, serverTimestamp, addDoc, increment, deleteDoc } from 'firebase/firestore';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2, ShoppingCart, Trash2, Send } from 'lucide-react';
 
@@ -89,7 +89,8 @@ export default function CartPage() {
   const deleteMutation = useMutation({
     mutationFn: async (cartItemId: string) => {
       if (!firestore || !user) throw new Error("Not authenticated");
-      await deleteDoc(doc(firestore, `users/${user.uid}/cart`, cartItemId));
+      const docRef = doc(firestore, `users/${user.uid}/cart`, cartItemId);
+      await deleteDoc(docRef);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart', user?.uid] });
@@ -136,11 +137,15 @@ export default function CartPage() {
     try {
         await Promise.all(orderPromises);
 
-        // Clear the cart
+        // Clear the cart AND update sales counts
         const batch = writeBatch(firestore);
         cartProducts.forEach(item => {
-            const docRef = doc(firestore, `users/${user.uid}/cart`, item.cartItemId);
-            batch.delete(docRef);
+            const cartDocRef = doc(firestore, `users/${user.uid}/cart`, item.cartItemId);
+            batch.delete(cartDocRef);
+
+            // Increment sales count for the purchased product
+            const productRef = doc(firestore, 'products', item.id);
+            batch.update(productRef, { sales: increment(item.quantity) });
         });
         await batch.commit();
 

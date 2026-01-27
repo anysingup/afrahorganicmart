@@ -26,8 +26,9 @@
         "images": { "type": "array", "items": { "type": "string" } },
         "price": { "type": "number" },
         "originalPrice": { "type": "number" },
-        "rating": { "type": "number" },
-        "reviews": { "type": "number" },
+        "rating": { "type": "number", "description": "The sum of all star ratings for the product." },
+        "reviews": { "type": "number", "description": "The number of reviews/ratings for the product." },
+        "sales": { "type": "number", "description": "The total number of times this product has been sold." },
         "isNew": { "type": "boolean" },
         "stock": { "type": "number" },
         "createdAt": { "type": "string", "format": "date-time" },
@@ -115,6 +116,20 @@
         "quantity",
         "addedAt"
       ]
+    },
+    "UserRating": {
+      "title": "User Rating",
+      "description": "Stores a user's rating for a specific product.",
+      "type": "object",
+      "properties": {
+        "rating": {
+          "type": "number",
+          "description": "The star rating (1-5) given by the user."
+        }
+      },
+      "required": [
+        "rating"
+      ]
     }
   },
   "auth": {
@@ -141,6 +156,12 @@
         "$ref": "#/backend/entities/CartItem"
       },
       "description": "Stores items in a user's shopping cart."
+    },
+    "/users/{userId}/ratedProducts/{productId}": {
+      "schema": {
+        "$ref": "#/backend/entities/UserRating"
+      },
+      "description": "Stores a user's rating for a single product to prevent multiple ratings."
     },
     "/orders/{orderId}": {
       "schema": {
