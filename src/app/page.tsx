@@ -59,7 +59,7 @@ export default function Home() {
         >
           <CarouselContent className="h-full -ml-0">
             {heroImages.map((image, index) => (
-              <CarouselItem key={index} className="h-full pl-0">
+              <CarouselItem key={index} className="h-full pl-0 relative">
                 <Image
                   src={image.src}
                   alt={image.alt}
