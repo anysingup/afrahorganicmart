@@ -65,3 +65,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .prose h1, .prose h2, .prose h3 { @apply font-headline font-bold mb-4 mt-8; }
+  .prose p, .prose ul, .prose ol { @apply mb-4 text-muted-foreground; }
+  .prose a { @apply text-primary hover:underline; }
+  .prose ul { @apply list-disc pl-6; }
+  .prose strong { @apply font-bold text-foreground; }
+  .prose .lead { @apply text-xl text-foreground font-normal; }
+}

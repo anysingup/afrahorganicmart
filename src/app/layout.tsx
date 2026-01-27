@@ -7,9 +7,7 @@ import Footer from '@/components/shared/footer';
 import FloatingWhatsapp from '@/components/shared/floating-whatsapp';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import FirebaseErrorListener from '@/components/FirebaseErrorListener';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient();
+import { ReactQueryProvider } from '@/components/shared/react-query-provider';
 
 export const metadata: Metadata = {
   title: 'Afrah Organic Mart - Fresh & Pure',
@@ -33,7 +31,7 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased'
         )}
       >
-        <QueryClientProvider client={queryClient}>
+        <ReactQueryProvider>
           <FirebaseClientProvider>
             <div className="relative flex min-h-screen flex-col">
               <Header />
@@ -44,7 +42,7 @@ export default function RootLayout({
             <FloatingWhatsapp />
             <FirebaseErrorListener />
           </FirebaseClientProvider>
-        </QueryClientProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );
