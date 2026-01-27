@@ -72,7 +72,7 @@ export default function Home() {
           </CarouselContent>
         </Carousel>
         <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-white px-4">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center text-white px-4">
           <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
             Pure, Organic, Divine.
           </h1>
