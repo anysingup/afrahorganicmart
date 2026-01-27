@@ -1,16 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Loader2, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, limit } from 'firebase/firestore';
 
-
-import { products } from '@/lib/data';
+import type { Product } from '@/lib/types';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,7 +32,7 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { useFirestore, useUser } from '@/firebase';
+import { useFirestore, useUser, useCollection } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
@@ -54,11 +53,18 @@ type ProductPageProps = {
 
 export default function ProductPage({ params }: ProductPageProps) {
   const { toast } = useToast();
-  const product = products.find((p) => p.slug === params.slug);
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const firestore = useFirestore();
   const { user } = useUser();
+
+  const productQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'products'), where('slug', '==', params.slug), limit(1));
+  }, [firestore, params.slug]);
+
+  const { data: productData, loading } = useCollection<Product>(productQuery);
+  const product = productData?.[0];
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -69,6 +75,14 @@ export default function ProductPage({ params }: ProductPageProps) {
       paymentMethod: 'cod',
     },
   });
+  
+  if (loading) {
+    return (
+        <div className="flex h-[60vh] items-center justify-center">
+            <Loader2 className="h-16 w-16 animate-spin text-primary" />
+        </div>
+    );
+  }
 
   if (!product) {
     notFound();
@@ -195,7 +209,11 @@ export default function ProductPage({ params }: ProductPageProps) {
             </div>
             <p className="text-sm text-muted-foreground">({product.stock} in stock)</p>
           </div>
-
+          
+          <Separator className="my-8" />
+          
+          <p className="text-muted-foreground whitespace-pre-wrap">{product.description}</p>
+          
           <Separator className="my-8" />
 
           <h2 className="font-headline text-2xl font-bold">Place Your Order</h2>
@@ -291,12 +309,14 @@ export default function ProductPage({ params }: ProductPageProps) {
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+              <Button type="submit" size="lg" className="w-full" disabled={isSubmitting || product.stock === 0}>
                  {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Placing Order...
                     </>
+                  ) : product.stock === 0 ? (
+                    'Out of Stock'
                   ) : (
                     <>
                       <ShoppingCart className="mr-2 h-5 w-5" />

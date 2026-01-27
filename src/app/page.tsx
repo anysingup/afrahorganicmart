@@ -1,7 +1,13 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Leaf, ShieldCheck, Star, Truck } from 'lucide-react';
+import { ArrowRight, Leaf, ShieldCheck, Star, Truck, Loader2 } from 'lucide-react';
+import { useMemo } from 'react';
+import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 
+import { useFirestore, useCollection } from '@/firebase';
+import type { Product } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Carousel,
@@ -13,13 +19,22 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProductCard from '@/components/shared/product-card';
-import { categories, products, testimonials, siteConfig } from '@/lib/data';
+import { categories, testimonials, siteConfig } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function Home() {
   const heroBanner = PlaceHolderImages.find(p => p.id === "hero-banner");
   const specialOfferImg = PlaceHolderImages.find(p => p.id === "special-offer");
-  const bestSellingProducts = products.slice(0, 4);
+  
+  const firestore = useFirestore();
+  
+  const bestSellersQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'products'), orderBy('createdAt', 'desc'), limit(4));
+  }, [firestore]);
+  
+  
+  const { data: bestSellingProducts, loading: loadingBestSellers } = useCollection<Product>(bestSellersQuery);
 
   return (
     <div className="flex flex-col gap-12 md:gap-20">
@@ -87,11 +102,17 @@ export default function Home() {
           <h2 className="font-headline text-3xl md:text-4xl font-bold">Our Best Sellers</h2>
           <p className="text-muted-foreground mt-2">Loved by our customers, chosen by nature.</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {bestSellingProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loadingBestSellers ? (
+          <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {bestSellingProducts?.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
         <div className="text-center mt-10">
            <Button asChild variant="outline" size="lg">
             <Link href="/shop">View All Products <ArrowRight className="ml-2 h-5 w-5" /></Link>
