@@ -117,13 +117,17 @@ export default function OrdersPage() {
                     <div className="text-sm text-muted-foreground">{order.address}</div>
                   </TableCell>
                   <TableCell>
-                    <ul className="list-disc pl-4 space-y-1">
-                      {order.items.map((item, index) => (
-                        <li key={index}>
-                          {item.productName} (x{item.quantity})
-                        </li>
-                      ))}
-                    </ul>
+                    {order.items && order.items.length > 0 ? (
+                      <ul className="list-disc pl-4 space-y-1">
+                        {order.items.map((item, index) => (
+                          <li key={index}>
+                            {item.productName} (x{item.quantity})
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="text-muted-foreground">No items</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">৳{order.totalPrice.toFixed(2)}</TableCell>
                   <TableCell className="text-center">
