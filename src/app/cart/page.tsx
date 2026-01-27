@@ -252,7 +252,7 @@ export default function CartPage() {
                       <FormItem className="space-y-3">
                         <FormLabel>Payment Method</FormLabel>
                         <FormControl>
-                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-2 gap-4">
+                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormItem className="flex items-center space-x-3 space-y-0">
                               <FormControl><RadioGroupItem value="cod" /></FormControl>
                               <FormLabel className="font-normal">Cash on Delivery</FormLabel>

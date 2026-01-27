@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, use } from 'react';
 import Image from 'next/image';
 import { notFound, useRouter } from 'next/navigation';
 import { Loader2, Minus, Plus, ShoppingCart, Star, Heart } from 'lucide-react';
@@ -69,7 +69,8 @@ const RatingInput = ({
 };
 
 
-export default function ProductPage({ params: { slug: productId } }: ProductPageProps) {
+export default function ProductPage({ params }: ProductPageProps) {
+  const { slug: productId } = params;
   const { toast } = useToast();
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
@@ -302,7 +303,7 @@ export default function ProductPage({ params: { slug: productId } }: ProductPage
             <p className="text-sm text-muted-foreground">({product.stock} in stock)</p>
           </div>
 
-          <div className="mt-8 flex gap-4">
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={isAddingToCart || product.stock === 0}>
               {isAddingToCart ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />

@@ -70,30 +70,42 @@ export default function Home() {
           <h2 className="font-headline text-3xl md:text-4xl font-bold">Shop by Category</h2>
           <p className="text-muted-foreground mt-2">Explore our wide range of organic goods.</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-          {categories.map((category) => {
-            const categoryImage = PlaceHolderImages.find(p => p.id === category.image);
-            return (
-              <Link href={`/category/${category.slug}`} key={category.id} className="group text-center">
-                <Card className="overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1 border-2 border-transparent hover:border-primary">
-                  <CardContent className="p-0">
-                    {categoryImage && (
-                       <Image
-                        src={categoryImage.imageUrl}
-                        alt={category.name}
-                        data-ai-hint={categoryImage.imageHint}
-                        width={200}
-                        height={200}
-                        className="aspect-square w-full object-cover"
-                      />
-                    )}
-                  </CardContent>
-                </Card>
-                <h3 className="mt-4 font-semibold text-lg">{category.name}</h3>
-              </Link>
-            );
-          })}
-        </div>
+        <Carousel
+          opts={{
+            align: "start",
+            dragFree: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {categories.map((category) => {
+              const categoryImage = PlaceHolderImages.find(p => p.id === category.image);
+              return (
+                <CarouselItem key={category.id} className="basis-1/3 sm:basis-1/4 md:basis-1/5 lg:basis-1/6 pl-2 md:pl-4">
+                  <Link href={`/category/${category.slug}`} className="group text-center">
+                    <Card className="overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1 border-2 border-transparent hover:border-primary">
+                      <CardContent className="p-0">
+                        {categoryImage && (
+                            <Image
+                            src={categoryImage.imageUrl}
+                            alt={category.name}
+                            data-ai-hint={categoryImage.imageHint}
+                            width={200}
+                            height={200}
+                            className="aspect-square w-full object-cover"
+                          />
+                        )}
+                      </CardContent>
+                    </Card>
+                    <h3 className="mt-2 font-semibold text-base truncate group-hover:text-primary">{category.name}</h3>
+                  </Link>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+          <CarouselPrevious className="hidden md:flex" />
+          <CarouselNext className="hidden md:flex" />
+        </Carousel>
       </section>
       
       {/* Best Selling Products */}
