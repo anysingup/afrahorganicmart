@@ -3,12 +3,12 @@
 // You can commit this file to your repository.
 // It will be replaced with the actual config during deployment.
 const firebaseConfig = {
-  apiKey: "REDACTED",
-  authDomain: "afrah-organic-mart.firebaseapp.com",
-  projectId: "afrah-organic-mart",
-  storageBucket: "afrah-organic-mart.appspot.com",
-  messagingSenderId: "REDACTED",
-  appId: "REDACTED"
+  "projectId": "studio-7855731859-cc213",
+  "appId": "1:160485985301:web:965df64ea2b58d7cfd921c",
+  "apiKey": "AIzaSyD_OZ8FQQ5aIrwyfLQjsLsvTlSBI83BSGc",
+  "authDomain": "studio-7855731859-cc213.firebaseapp.com",
+  "measurementId": "",
+  "messagingSenderId": "160485985301"
 };
 
 export default firebaseConfig;
