@@ -84,11 +84,17 @@ export default function AdminDashboard() {
                       <div className="text-sm text-muted-foreground">{order.phone}</div>
                     </TableCell>
                     <TableCell>
-                      {order.items[0].productName}
-                      {order.items.length > 1 && (
-                        <span className="text-xs text-muted-foreground ml-1">
-                          + {order.items.length - 1} more
-                        </span>
+                      {order.items && order.items.length > 0 ? (
+                        <>
+                          {order.items[0].productName}
+                          {order.items.length > 1 && (
+                            <span className="text-xs text-muted-foreground ml-1">
+                              + {order.items.length - 1} more
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        'N/A'
                       )}
                     </TableCell>
                     <TableCell className="text-right">৳{order.totalPrice.toFixed(2)}</TableCell>
