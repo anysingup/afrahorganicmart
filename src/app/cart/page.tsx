@@ -127,18 +127,10 @@ export default function CartPage() {
 
     try {
         const ordersCollection = collection(firestore, 'orders');
-        addDoc(ordersCollection, newOrder)
-          .catch((e) => {
-              const permissionError = new FirestorePermissionError({
-                path: 'orders',
-                operation: 'create',
-                requestResourceData: newOrder,
-            });
-            errorEmitter.emit('permission-error', permissionError);
-            throw e; // re-throw to be caught by the main try-catch
-          });
+        // Correctly await the creation of the order document
+        await addDoc(ordersCollection, newOrder);
 
-        // Clear the cart AND update sales counts
+        // If the order is created successfully, then clear cart and update product sales
         const batch = writeBatch(firestore);
         cartProducts.forEach(item => {
             const cartDocRef = doc(firestore, `users/${user.uid}/cart`, item.cartItemId);
@@ -156,8 +148,24 @@ export default function CartPage() {
         form.reset();
         queryClient.invalidateQueries({ queryKey: ['cart', user?.uid] });
 
-    } catch (error) {
-        // Error toast is handled by the emitter, so no need for an extra toast here
+    } catch (error: any) {
+        console.error("Order placement failed:", error);
+        
+        // Handle permission errors specifically for better debugging
+        if (error.code === 'permission-denied') {
+             const permissionError = new FirestorePermissionError({
+                path: 'orders',
+                operation: 'create',
+                requestResourceData: newOrder,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        } else {
+             toast({
+                variant: 'destructive',
+                title: 'Something went wrong',
+                description: 'Your order could not be placed. Please try again.',
+            });
+        }
     } finally {
         setIsSubmitting(false);
     }

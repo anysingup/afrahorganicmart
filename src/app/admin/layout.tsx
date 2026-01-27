@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 import { useUser } from '@/firebase';
@@ -12,55 +12,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, isAdmin, loading: userLoading } = useUser();
   const router = useRouter();
   const pathname = usePathname();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (userLoading) {
-      // If the user hook is still loading, we wait.
-      setLoading(true);
-      return;
-    }
-    
-    // Handle user not being logged in
-    if (!user) {
-      if (pathname !== '/admin/login') {
+    if (!userLoading) {
+      // If user is loaded, but is not an admin and not trying to login, redirect.
+      if (!isAdmin && pathname !== '/admin/login') {
         router.push('/admin/login');
-      } else {
-        // We are on the login page, so it's not a loading state anymore for the layout
-        setLoading(false);
-        setIsAuthorized(false);
       }
-      return;
+      // If user is an admin and is on the login page, redirect to dashboard.
+      if (isAdmin && pathname === '/admin/login') {
+        router.push('/admin');
+      }
     }
-    
-    // Handle logged-in user who is not an admin
-    if (!isAdmin) {
-      router.push('/');
-      return;
-    }
-
-    // If we reach here, user is an admin
-    setIsAuthorized(true);
-    setLoading(false);
-
   }, [user, isAdmin, userLoading, router, pathname]);
 
-  if (loading) {
+  // Show a loader while user status is being determined.
+  if (userLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
-  
-  // If on login page, just show the login page content
-  if (pathname === '/admin/login') {
-    return <>{children}</>;
-  }
 
-  // If authorized, show the admin layout
-  if (isAuthorized) {
+  // If the user is an admin and not on the login page, show the admin layout.
+  if (isAdmin && pathname !== '/admin/login') {
     return (
       <SidebarProvider>
         <Sidebar>
@@ -79,6 +55,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // Fallback for any other case (e.g. redirecting)
-  return null;
+  // For non-admins, only show the content if it's the login page.
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
+  // For any other case (e.g. non-admin trying to access a protected route while redirecting), show loader.
+  return (
+    <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+    </div>
+  );
 }
