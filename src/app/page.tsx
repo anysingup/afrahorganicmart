@@ -3,8 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Leaf, ShieldCheck, Star, Truck, Loader2 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { collection, query, where, orderBy, limit } from 'firebase/firestore';
+import Autoplay from 'embla-carousel-autoplay';
 
 import { useFirestore, useCollection } from '@/firebase';
 import type { Product } from '@/lib/types';
@@ -23,10 +24,19 @@ import { categories, testimonials, siteConfig } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function Home() {
-  const heroBanner = PlaceHolderImages.find(p => p.id === "hero-banner");
   const specialOfferImg = PlaceHolderImages.find(p => p.id === "special-offer");
   
   const firestore = useFirestore();
+
+  const plugin = useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: true })
+  );
+
+  const heroImages = [
+    { src: 'https://i.postimg.cc/8Pkh6Grg/1.png', alt: 'Fresh organic products on display' },
+    { src: 'https://i.postimg.cc/XYd7NG79/2.png', alt: 'A variety of dates and nuts' },
+    { src: 'https://i.postimg.cc/3xXY5snD/Gold-Special-Date-Fruit-Background-Ramadan-Kareem-Instagram-Post-Template.png', alt: 'Special offer on golden dates for Ramadan' }
+  ];
   
   const bestSellersQuery = useMemo(() => {
     if (!firestore) return null;
@@ -39,17 +49,28 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-12 md:gap-20">
       {/* Hero Section */}
-      <section className="relative h-[60vh] md:h-[80vh] w-full">
-        {heroBanner && (
-          <Image
-            src={heroBanner.imageUrl}
-            alt={heroBanner.description}
-            data-ai-hint={heroBanner.imageHint}
-            fill
-            className="object-cover"
-            priority
-          />
-        )}
+      <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden">
+        <Carousel
+          plugins={[plugin.current]}
+          className="absolute inset-0 w-full h-full"
+          opts={{ loop: true }}
+          onMouseEnter={plugin.current.stop}
+          onMouseLeave={plugin.current.reset}
+        >
+          <CarouselContent className="h-full -ml-0">
+            {heroImages.map((image, index) => (
+              <CarouselItem key={index} className="h-full pl-0">
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-white px-4">
           <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
