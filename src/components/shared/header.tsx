@@ -13,7 +13,6 @@ import { useUser } from '@/firebase';
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop' },
-  { href: '/about', label: 'About Us' },
   { href: '/contact', label: 'Contact' },
 ];
 

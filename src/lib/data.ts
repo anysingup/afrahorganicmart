@@ -3,8 +3,8 @@ import type { Category, Product, Testimonial } from './types';
 export const siteConfig = {
     name: "Afrah Organic Mart",
     phone: "01830989616",
-    email: "contact@afrahorganic.com",
-    address: "Dhaka, Bangladesh",
+    email: "afrahorganicmart@gmail.com",
+    address: "House-40, Road-05, Shakertec, Adabor, Dhaka, Dhaka, Bangladesh, 1216",
     social: {
         facebook: "https://www.facebook.com/profile.php?id=61587084541625",
         instagram: "https://www.instagram.com/afrahorganicmart/",
