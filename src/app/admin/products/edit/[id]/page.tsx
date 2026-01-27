@@ -13,8 +13,7 @@ type EditProductPageProps = {
     };
 };
 
-export default function EditProductPage({ params }: EditProductPageProps) {
-    const { id } = params;
+export default function EditProductPage({ params: { id } }: EditProductPageProps) {
     const firestore = useFirestore();
     const productRef = useMemo(() => (
         firestore ? doc(firestore, "products", id) : null

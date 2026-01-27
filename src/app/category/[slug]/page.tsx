@@ -16,8 +16,7 @@ type CategoryPageProps = {
   };
 };
 
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const { slug } = params;
+export default function CategoryPage({ params: { slug } }: CategoryPageProps) {
   const firestore = useFirestore();
 
   const category = useMemo(() => categories.find(c => c.slug === slug), [slug]);

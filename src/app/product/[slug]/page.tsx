@@ -69,7 +69,7 @@ const RatingInput = ({
 };
 
 
-export default function ProductPage({ params }: ProductPageProps) {
+export default function ProductPage({ params: { slug: productId } }: ProductPageProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
@@ -77,7 +77,6 @@ export default function ProductPage({ params }: ProductPageProps) {
   const [isRating, setIsRating] = useState(false);
   const firestore = useFirestore();
   const { user } = useUser();
-  const { slug: productId } = params;
 
   const productRef = useMemo(() => {
     if (!firestore || !productId) return null;
