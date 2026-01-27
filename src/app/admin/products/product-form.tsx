@@ -229,12 +229,12 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         name="images"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Image IDs</FormLabel>
+                                <FormLabel>Product Image ID</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="e.g., product-ajwa, product-ajwa-2" {...field} />
+                                    <Input placeholder="e.g., product-ajwa" {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                    Comma-separated placeholder image IDs from placeholder-images.json.
+                                    Currently, the system uses a central image library. To add a new image, please provide the image URL to the AI assistant, for example: "add a new product image with ID 'new-product-id' and URL 'https://example.com/image.jpg'". Then, use that ID here.
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
