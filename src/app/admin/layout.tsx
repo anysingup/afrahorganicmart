@@ -2,70 +2,65 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { doc, getDoc, Firestore } from 'firebase/firestore';
 
 import { useUser } from '@/firebase';
-import { useFirestore } from '@/firebase';
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import AdminNav from '@/components/shared/admin-nav';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading: userLoading } = useUser();
-  const firestore = useFirestore();
+  const { user, isAdmin, loading: userLoading } = useUser();
   const router = useRouter();
   const pathname = usePathname();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (userLoading) {
+      // If the user hook is still loading, we wait.
+      setLoading(true);
       return;
     }
+    
+    // Handle user not being logged in
     if (!user) {
       if (pathname !== '/admin/login') {
         router.push('/admin/login');
       } else {
+        // We are on the login page, so it's not a loading state anymore for the layout
         setLoading(false);
+        setIsAuthorized(false);
       }
       return;
     }
-
-    const checkAdminStatus = async (db: Firestore, uid: string) => {
-      const adminDocRef = doc(db, 'admins', uid);
-      const adminDocSnap = await getDoc(adminDocRef);
-      if (adminDocSnap.exists() && adminDocSnap.data().isAdmin === true) {
-        setIsAdmin(true);
-      } else {
-        // If not an admin, redirect to home.
-        router.push('/');
-      }
-      setLoading(false);
-    };
-
-    if (firestore && user) {
-      checkAdminStatus(firestore, user.uid);
+    
+    // Handle logged-in user who is not an admin
+    if (!isAdmin) {
+      router.push('/');
+      return;
     }
 
-  }, [user, userLoading, firestore, router, pathname]);
+    // If we reach here, user is an admin
+    setIsAuthorized(true);
+    setLoading(false);
 
-  if (loading || userLoading) {
+  }, [user, isAdmin, userLoading, router, pathname]);
+
+  if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
-
-  if (!user && pathname !== '/admin/login') {
-     return null; // The redirect is already in progress
-  }
   
+  // If on login page, just show the login page content
   if (pathname === '/admin/login') {
     return <>{children}</>;
   }
 
-  if (isAdmin) {
+  // If authorized, show the admin layout
+  if (isAuthorized) {
     return (
       <SidebarProvider>
         <Sidebar>
@@ -84,5 +79,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  return null; // Or a 'Not Authorized' page
+  // Fallback for any other case (e.g. redirecting)
+  return null;
 }
