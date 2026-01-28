@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 import { useUser } from '@/firebase';
@@ -12,6 +12,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, isAdmin, loading: userLoading } = useUser();
   const router = useRouter();
   const pathname = usePathname();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   useEffect(() => {
     if (!userLoading) {
@@ -37,6 +43,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // If the user is an admin and not on the login page, show the admin layout.
   if (isAdmin && pathname !== '/admin/login') {
+    if (!isClient) {
+      // Render a loader on the server and initial client render to avoid hydration mismatch
+      return (
+        <div className="flex h-screen items-center justify-center">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+      );
+    }
+
     return (
       <SidebarProvider>
         <Sidebar>
