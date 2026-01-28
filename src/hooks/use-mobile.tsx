@@ -1,34 +1,22 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
+import { useState, useEffect } from 'react';
 
 const MOBILE_BREAKPOINT = 768;
 
-function subscribe(callback: () => void) {
-  const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-  mql.addEventListener('change', callback);
-  return () => {
-    mql.removeEventListener('change', callback);
-  };
-}
+export function useIsMobile() {
+  const [isMobile, setIsMobile] = useState<boolean | undefined>(undefined);
 
-function getSnapshot() {
-  // This function is only called on the client.
-  return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`).matches;
-}
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    setIsMobile(mql.matches);
 
-// On the server, React will use this value.
-// It must be consistent with the initial client-side render to avoid a mismatch.
-function getServerSnapshot() {
-  return false;
-}
+    const listener = (e: MediaQueryListEvent) => setIsMobile(e.matches);
 
-export function useIsMobile(): boolean {
-  // useSyncExternalStore is the modern, safe way to subscribe to external browser APIs.
-  const isMobile = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot
-  );
+    mql.addEventListener('change', listener);
+
+    return () => mql.removeEventListener('change', listener);
+  }, []);
+
   return isMobile;
 }
