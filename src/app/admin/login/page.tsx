@@ -5,12 +5,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { Loader2, LogIn } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { useAuth } from '@/firebase';
+import { useAuth, useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -35,6 +36,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const auth = useAuth();
+  const firestore = useFirestore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,7 +48,7 @@ export default function LoginPage() {
   });
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    if (!auth) {
+    if (!auth || !firestore) {
         toast({
             variant: "destructive",
             title: "Authentication service not available.",
@@ -56,18 +58,37 @@ export default function LoginPage() {
     }
     setIsSubmitting(true);
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      toast({
-        title: 'Login Successful!',
-        description: "You're now logged in.",
-      });
-      router.push('/admin');
+      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+
+      // Check admin status immediately after login
+      const adminDocRef = doc(firestore, 'admins', user.uid);
+      const adminDocSnap = await getDoc(adminDocRef);
+
+      if (adminDocSnap.exists() && adminDocSnap.data().isAdmin === true) {
+        toast({
+          title: 'Login Successful!',
+          description: "You're now logged in.",
+        });
+        router.push('/admin');
+      } else {
+        // Not an admin, sign them out and show an error
+        await signOut(auth);
+        toast({
+          variant: 'destructive',
+          title: 'Access Denied',
+          description: 'You do not have permission to access the admin panel.',
+        });
+      }
     } catch (e: any) {
       console.error('Login failed', e);
+       const errorMessage = e.code === 'auth/invalid-credential' 
+        ? 'Invalid email or password. Please try again.'
+        : (e.message || 'An unknown error occurred during login.');
       toast({
         variant: 'destructive',
         title: 'Login Failed',
-        description: e.message || 'Invalid email or password. Please try again.',
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);
