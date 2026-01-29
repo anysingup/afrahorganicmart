@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
-import { LayoutDashboard, LogOut, Package, ShoppingCart, Mail } from 'lucide-react';
+import { LayoutDashboard, LogOut, Package, ShoppingCart, Mail, Users } from 'lucide-react';
 
 import { useAuth } from '@/firebase';
 import {
@@ -22,6 +22,7 @@ const links = [
   { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/messages', label: 'Messages', icon: Mail },
+  { href: '/admin/users', label: 'Users', icon: Users },
 ];
 
 export default function AdminNav() {
