@@ -51,14 +51,7 @@ export default function Home() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center text-white px-4">
-          <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-            Pure, Organic, Divine.
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/90">
-            Discover the finest selection of organic products, delivered from nature to your doorstep.
-          </p>
           <Button asChild size="lg" className="mt-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
             <Link href="/shop">Shop Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
           </Button>
